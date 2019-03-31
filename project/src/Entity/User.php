@@ -51,7 +51,7 @@ class User implements UserInterface
      */
     private $lastname;
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -163,5 +163,10 @@ class User implements UserInterface
         $this->lastname = $lastname;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->getId();
     }
 }
