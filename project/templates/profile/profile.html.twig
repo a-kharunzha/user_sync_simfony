@@ -13,5 +13,18 @@
 
     You are authorized <br>
     <a href="{{ path('app_logout') }}">Logout</a>
+    <br><br>
+    {% if message %}
+    {{ message  }}
+    <br><br>
+    {% endif %}
+    {{ form_start(profileForm) }}
+        {{ form_row(profileForm.login) }}
+        {{ form_row(profileForm.name) }}
+        {{ form_row(profileForm.lastname) }}
+        {{ form_row(profileForm.email) }}
+
+        <button class="btn">Update profile</button>
+    {{ form_end(profileForm) }}
 </div>
 {% endblock %}
