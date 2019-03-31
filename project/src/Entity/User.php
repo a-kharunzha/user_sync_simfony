@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -10,6 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
  * @UniqueEntity(fields={"login"}, message="There is already an account with this login")
+ * @ApiResource()
  */
 class User implements UserInterface
 {
@@ -50,6 +52,11 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      */
     private $lastname;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $apiKey;
 
     public function getId(): ?string
     {
@@ -168,5 +175,17 @@ class User implements UserInterface
     public function __toString()
     {
         return (string) $this->getId();
+    }
+
+    public function getApiKey(): ?string
+    {
+        return $this->apiKey;
+    }
+
+    public function setApiKey(?string $apiKey): self
+    {
+        $this->apiKey = $apiKey;
+
+        return $this;
     }
 }
