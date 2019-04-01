@@ -1,0 +1,56 @@
+version: "3"
+
+services:
+  fpm:
+    build: # Info to build the Docker image
+      context: . # Specify where the Dockerfile is located (e.g. in the root directory of the project)
+      dockerfile: ./docker/Dockerfile-php # Specify the name of the Dockerfile
+    environment: # You can use this section to set environment variables. But you can also use the .env file.
+      - DATABASE_URL=mysql://${MYSQL_ROOT_USER}:${MYSQL_ROOT_PASSWORD}@db:3306/${MYSQL_DATABASE} # Connection string for the database.
+      - REMOTE_API_UPL=${REMOTE_API_UPL}
+    volumes:
+      - ./project/:/var/www/project/ # Location of the project for php-fpm. Note this should be the same for NGINX.
+    networks:
+      - instance1 # Docker containers (services) that need to connect to each other should be on the same network.
+    container_name: instance1_fpm
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile-nginx
+    volumes:
+      - ./project/:/var/www/project/
+    ports:
+      - ${NGINX_PORT}:80 # Ports that are exposed, you can connect to port ${NGINX_PORT} to port 80 of the container.
+    networks:
+      - instance1
+
+  db:
+    image: mysql:${MYSQL_VERSION}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} # Setting the MYSQL credentials to root:root.
+    volumes:
+      - symfony_db:/var/lib/mysql:cached # Persist the database in a Docker volume.
+    ports:
+      - ${MYSQL_PORT}:3306
+    networks:
+      - instance1
+
+  myadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - ${MYSQL_PMA_PORT}:80
+    environment:
+      - PMA_HOST=db
+    restart: always
+    depends_on:
+      - db
+    networks:
+      - instance1
+
+
+volumes:
+  symfony_db:
+
+networks:
+  instance1:
